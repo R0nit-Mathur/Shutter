@@ -3,27 +3,49 @@
 import { useState } from 'react';
 
 interface ScanInputFormProps {
-  onSubmit: (data: { name: string; category: string; description: string; engines: string[] }) => void;
+  onSubmit: (data: { 
+    website: string; 
+    name: string; 
+    description: string; 
+    competitors: string; 
+    engines: string[]; 
+  }) => void;
   isLoading: boolean;
 }
 
 const ENGINE_OPTIONS = [
   { id: 'openai', label: 'OpenAI GPT-4o' },
-  { id: 'gemini', label: 'Gemini 2.5 Flash' },
+  { id: 'gemini', label: 'Gemini 3.5 Flash' },
   { id: 'claude', label: 'Claude 3.5 Sonnet' },
   { id: 'perplexity', label: 'Perplexity Search' }
 ];
 
 const PRESET_BRANDS = [
-  { name: 'Linear', category: 'Project Management Software', desc: 'A fast keyboard-first task manager for engineering teams.' },
-  { name: 'Supabase', category: 'Developer Database Platform', desc: 'An open-source Firebase alternative utilizing PostgreSQL.' },
-  { name: 'HubSpot', category: 'B2B Sales CRM', desc: 'A user-friendly pipeline management and marketing automation platform.' }
+  { 
+    name: 'Linear', 
+    website: 'https://linear.app', 
+    desc: 'A fast keyboard-first task manager for engineering teams.', 
+    competitors: 'Jira, Asana, Monday.com' 
+  },
+  { 
+    name: 'Supabase', 
+    website: 'https://supabase.com', 
+    desc: 'An open-source Firebase alternative utilizing PostgreSQL.', 
+    competitors: 'Firebase, PlanetScale, Neon' 
+  },
+  { 
+    name: 'Vercel', 
+    website: 'https://vercel.com', 
+    desc: 'Frontend cloud platform for rendering, hosting, and scaling React web applications.', 
+    competitors: 'Netlify, Cloudflare Pages, AWS Amplify' 
+  }
 ];
 
 export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProps) {
+  const [website, setWebsite] = useState('');
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
+  const [competitors, setCompetitors] = useState('');
   const [selectedEngines, setSelectedEngines] = useState<string[]>(['openai', 'gemini', 'claude', 'perplexity']);
 
   const handleToggleEngine = (id: string) => {
@@ -36,24 +58,34 @@ export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProp
 
   const applyPreset = (preset: typeof PRESET_BRANDS[0]) => {
     setName(preset.name);
-    setCategory(preset.category);
+    setWebsite(preset.website);
     setDescription(preset.desc);
+    setCompetitors(preset.competitors);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !category.trim()) {
-      alert('Please fill out both the Brand Name and Category fields.');
+    if (!website.trim() || !name.trim()) {
+      alert('Please fill out both the Website URL and Brand Name fields.');
       return;
     }
+    
+    // Auto-prepend protocol if not present
+    let formattedWebsite = website.trim();
+    if (!/^https?:\/\//i.test(formattedWebsite)) {
+      formattedWebsite = 'https://' + formattedWebsite;
+    }
+
     if (selectedEngines.length === 0) {
       alert('Please select at least one AI engine to scan.');
       return;
     }
+
     onSubmit({
+      website: formattedWebsite,
       name: name.trim(),
-      category: category.trim(),
       description: description.trim(),
+      competitors: competitors.trim(),
       engines: selectedEngines
     });
   };
@@ -61,8 +93,8 @@ export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProp
   return (
     <form onSubmit={handleSubmit} className="space-y-8 bg-white/[0.01] border border-white/[0.05] p-8 rounded-2xl">
       <div>
-        <h3 className="text-lg font-semibold text-white mb-2">Audit Launchpad</h3>
-        <p className="text-xs text-text-secondary">Run multi-model AEO audits against LLM parameter indexes.</p>
+        <h3 className="text-lg font-semibold text-white">AEO Diagnostic Scan</h3>
+        <p className="text-xs text-text-secondary mt-1">Identify semantic gaps and test model visibility across target AI indexes.</p>
       </div>
 
       {/* Preset Badges */}
@@ -85,38 +117,51 @@ export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProp
       </div>
 
       <div className="space-y-6">
-        {/* Name & Category Row */}
+        {/* Name & Website Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-white uppercase tracking-wider block">Website URL</label>
+            <input
+              type="text"
+              placeholder="e.g. https://supabase.com"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              disabled={isLoading}
+              className="w-full bg-brand-bg border border-white/[0.08] focus:border-accent text-sm rounded-xl px-4 py-3 text-white placeholder:text-white/20 outline-none transition-all"
+            />
+          </div>
+
           <div className="space-y-2">
             <label className="text-xs font-semibold text-white uppercase tracking-wider block">Brand / Product Name</label>
             <input
               type="text"
-              placeholder="e.g. Linear"
+              placeholder="e.g. Supabase"
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={isLoading}
               className="w-full bg-brand-bg border border-white/[0.08] focus:border-accent text-sm rounded-xl px-4 py-3 text-white placeholder:text-white/20 outline-none transition-all"
             />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-white uppercase tracking-wider block">Industry Category</label>
-            <input
-              type="text"
-              placeholder="e.g. Project Management"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              disabled={isLoading}
-              className="w-full bg-brand-bg border border-white/[0.08] focus:border-accent text-sm rounded-xl px-4 py-3 text-white placeholder:text-white/20 outline-none transition-all"
-            />
-          </div>
+        {/* Competitors */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-white uppercase tracking-wider block">Competitors (Optional)</label>
+          <input
+            type="text"
+            placeholder="e.g. Firebase, PlanetScale, Neon (comma-separated)"
+            value={competitors}
+            onChange={(e) => setCompetitors(e.target.value)}
+            disabled={isLoading}
+            className="w-full bg-brand-bg border border-white/[0.08] focus:border-accent text-sm rounded-xl px-4 py-3 text-white placeholder:text-white/20 outline-none transition-all"
+          />
         </div>
 
         {/* Description */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-white uppercase tracking-wider block">Short Description (Optional)</label>
+          <label className="text-xs font-semibold text-white uppercase tracking-wider block">What does this business do? (Optional)</label>
           <textarea
-            placeholder="A brief overview of features, target audience, and positioning..."
+            placeholder="A brief overview of features, value propositions, and customer demographics..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={isLoading}
@@ -158,7 +203,7 @@ export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProp
         disabled={isLoading}
         className="w-full py-4 bg-white text-brand-bg hover:bg-white/95 disabled:opacity-50 font-semibold text-sm rounded-xl text-center transition-all duration-200 hover:shadow-xl hover:shadow-white/5 cursor-pointer"
       >
-        {isLoading ? 'Scanning AI Engine Indexes...' : 'Run Diagnostics Scan'}
+        {isLoading ? 'Scanning AI Engine Indexes...' : 'Launch Diagnostics Audit'}
       </button>
     </form>
   );

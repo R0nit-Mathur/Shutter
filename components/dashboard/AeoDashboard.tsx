@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import ScanInputForm from './ScanInputForm';
 import LoadingProgress from './LoadingProgress';
 import AuditReportView from './AuditReportView';
@@ -8,10 +9,13 @@ import ApiKeysPanel from './ApiKeysPanel';
 
 export default function AeoDashboard() {
   const [isScanning, setIsScanning] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [pendingResult, setPendingResult] = useState<any>(null);
   const [scanResult, setScanResult] = useState<any>(null);
   const [history, setHistory] = useState<any[]>([]);
   const [activeEngines, setActiveEngines] = useState<string[]>([]);
   const [isKeysOpen, setIsKeysOpen] = useState(false);
+  const [isRevealing, setIsRevealing] = useState(false);
 
   // Load scan history from localStorage on mount
   useEffect(() => {
@@ -27,8 +31,16 @@ export default function AeoDashboard() {
     }
   }, []);
 
-  const handleRunScan = async (data: { name: string; category: string; description: string; engines: string[] }) => {
+  const handleRunScan = async (data: { 
+    website: string; 
+    name: string; 
+    description: string; 
+    competitors: string; 
+    engines: string[]; 
+  }) => {
     setIsScanning(true);
+    setIsReady(false);
+    setPendingResult(null);
     setScanResult(null);
     setActiveEngines(data.engines);
 
@@ -54,9 +66,10 @@ export default function AeoDashboard() {
         method: 'POST',
         headers,
         body: JSON.stringify({
+          website: data.website,
           name: data.name,
-          category: data.category,
           description: data.description,
+          competitors: data.competitors,
         }),
       });
 
@@ -66,21 +79,31 @@ export default function AeoDashboard() {
       }
 
       const result = await response.json();
-      setScanResult(result);
-
-      // Append results to cache log history
-      const updatedHistory = [result, ...history.filter(h => h.metadata.timestamp !== result.metadata.timestamp)].slice(0, 10);
+      setPendingResult(result);
+      
+      // Add result to history log
+      const updatedHistory = [result, ...history.filter(h => h.metadata?.timestamp !== result.metadata?.timestamp)].slice(0, 10);
       setHistory(updatedHistory);
       if (typeof window !== 'undefined') {
         localStorage.setItem('shutter_scan_history', JSON.stringify(updatedHistory));
       }
 
+      // Trigger transition sequence inside LoadingProgress
+      setIsReady(true);
+
     } catch (error: any) {
       console.error(error);
       alert(`❌ Diagnostic Scan Failed: ${error.message || error}`);
-    } finally {
       setIsScanning(false);
     }
+  };
+
+  const handleRevealComplete = () => {
+    // Unmount loading HUD, mount final report and trigger fade-out white transition
+    setScanResult(pendingResult);
+    setIsScanning(false);
+    setIsReady(false);
+    setIsRevealing(true);
   };
 
   const handleSelectHistory = (pastResult: any) => {
@@ -98,95 +121,111 @@ export default function AeoDashboard() {
 
   const handleResetForm = () => {
     setScanResult(null);
+    setPendingResult(null);
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-6 py-24 min-h-screen">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-        
-        {/* Left Console Panel (Scans list & Keys triggers) */}
-        <div className="lg:col-span-3 flex flex-col justify-between border border-white/[0.05] bg-white/[0.01] rounded-2xl p-6 min-h-[300px] lg:min-h-0">
-          <div>
-            <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-6">
-              <span className="text-xs font-bold text-white uppercase tracking-widest">
-                AEO Console
-              </span>
-              <button
-                onClick={() => setIsKeysOpen(true)}
-                className="text-[10px] text-accent font-semibold hover:underline cursor-pointer flex items-center gap-1"
-              >
-                ⚙ Keys Setup
-              </button>
-            </div>
-
-            {/* History Logs */}
-            <div className="space-y-4">
-              <span className="text-[10px] text-text-secondary uppercase tracking-widest font-bold block">
-                Recent Scans
-              </span>
-              {history.length === 0 ? (
-                <span className="text-xs text-text-secondary italic block py-4">
-                  No past scans recorded.
-                </span>
-              ) : (
-                <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
-                  {history.map((pastScan, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSelectHistory(pastScan)}
-                      className={`w-full text-left text-xs font-medium p-3 rounded-xl border transition-all cursor-pointer block truncate ${
-                        scanResult?.metadata?.timestamp === pastScan.metadata?.timestamp
-                          ? 'border-accent/40 bg-accent/5 text-accent'
-                          : 'border-white/[0.03] text-text-secondary hover:text-white hover:bg-white/[0.02]'
-                      }`}
-                    >
-                      <span className="font-semibold block truncate">{pastScan.metadata.productName}</span>
-                      <span className="text-[10px] text-text-secondary opacity-65 block truncate mt-1">
-                        {pastScan.metadata.productCategory}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+    <div className="w-full h-full flex overflow-hidden relative">
+      
+      {/* 1. Left Console Sidebar */}
+      <aside className="w-[320px] shrink-0 border-r border-white/[0.05] bg-white/[0.01] p-6 flex flex-col justify-between h-full overflow-y-auto">
+        <div>
+          <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-6">
+            <span className="text-xs font-bold text-white uppercase tracking-widest">
+              AEO Console
+            </span>
+            <button
+              onClick={() => setIsKeysOpen(true)}
+              className="text-[10px] text-accent font-semibold hover:underline cursor-pointer flex items-center gap-1"
+            >
+              ⚙ Keys Setup
+            </button>
           </div>
 
-          {/* Settings / Actions */}
-          <div className="border-t border-white/[0.05] pt-6 mt-6 flex flex-col gap-3">
-            {scanResult && !isScanning && (
-              <button
-                onClick={handleResetForm}
-                className="w-full py-3 bg-white text-brand-bg hover:bg-white/90 font-semibold text-xs rounded-xl text-center transition-all cursor-pointer"
-              >
-                + New Audit
-              </button>
-            )}
-            {history.length > 0 && (
-              <button
-                onClick={handleClearHistory}
-                className="w-full py-3 border border-white/10 hover:bg-white/5 text-text-secondary hover:text-white font-semibold text-[10px] rounded-xl text-center transition-all cursor-pointer"
-              >
-                Clear History
-              </button>
+          {/* History Logs */}
+          <div className="space-y-4">
+            <span className="text-[10px] text-text-secondary uppercase tracking-widest font-bold block">
+              Recent Scans
+            </span>
+            {history.length === 0 ? (
+              <span className="text-xs text-text-secondary italic block py-4">
+                No past scans recorded.
+              </span>
+            ) : (
+              <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1">
+                {history.map((pastScan, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleSelectHistory(pastScan)}
+                    className={`w-full text-left text-xs font-medium p-3 rounded-xl border transition-all cursor-pointer block truncate ${
+                      scanResult?.metadata?.timestamp === pastScan.metadata?.timestamp
+                        ? 'border-accent/40 bg-accent/5 text-accent'
+                        : 'border-white/[0.03] text-text-secondary hover:text-white hover:bg-white/[0.02]'
+                    }`}
+                  >
+                    <span className="font-semibold block truncate">{pastScan.metadata?.productName || 'Unnamed'}</span>
+                    <span className="text-[10px] text-text-secondary opacity-65 block truncate mt-1">
+                      {pastScan.metadata?.website ? pastScan.metadata.website.replace(/^https?:\/\//i, '') : 'No url'}
+                    </span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
 
-        {/* Right Dashboard Area (Scan execution outputs) */}
-        <div className="lg:col-span-9 flex flex-col justify-start">
-          {isScanning ? (
-            <LoadingProgress engines={activeEngines} />
-          ) : scanResult ? (
-            <AuditReportView report={scanResult} />
-          ) : (
-            <ScanInputForm onSubmit={handleRunScan} isLoading={isScanning} />
+        {/* Settings / Actions */}
+        <div className="border-t border-white/[0.05] pt-6 mt-6 flex flex-col gap-3">
+          {scanResult && !isScanning && (
+            <button
+              onClick={handleResetForm}
+              className="w-full py-3 bg-white text-brand-bg hover:bg-white/90 font-semibold text-xs rounded-xl text-center transition-all cursor-pointer"
+            >
+              + New Audit
+            </button>
+          )}
+          {history.length > 0 && (
+            <button
+              onClick={handleClearHistory}
+              className="w-full py-3 border border-white/10 hover:bg-white/5 text-text-secondary hover:text-white font-semibold text-[10px] rounded-xl text-center transition-all cursor-pointer"
+            >
+              Clear History
+            </button>
           )}
         </div>
+      </aside>
 
-      </div>
+      {/* 2. Right Workspace Content (Scan execution outputs) */}
+      <main className="flex-grow h-full overflow-y-auto p-8 bg-black/10">
+        {scanResult ? (
+          <AuditReportView report={scanResult} />
+        ) : (
+          <div className="max-w-4xl mx-auto py-12">
+            <ScanInputForm onSubmit={handleRunScan} isLoading={isScanning} />
+          </div>
+        )}
+      </main>
 
-      {/* Slide-out API settings drawer */}
-      <ApiKeysPanel isOpen={isKeysOpen} onClose={() => setIsKeysOpen(false)} />
+      {/* Full screen Temporal Loom overlay */}
+      {isScanning && (
+        <LoadingProgress 
+          engines={activeEngines} 
+          isReady={isReady} 
+          onRevealComplete={handleRevealComplete}
+        />
+      )}
+
+      {/* White circle reveal zoom transition overlay */}
+      {isRevealing && (
+        <motion.div
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          onAnimationComplete={() => setIsRevealing(false)}
+          className="fixed inset-0 bg-white z-[60] pointer-events-none"
+        />
+      )}
+
     </div>
   );
 }
