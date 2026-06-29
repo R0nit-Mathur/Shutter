@@ -43,7 +43,14 @@ export default function Navbar({ session }: NavbarProps) {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-accent to-[#70a3ff] shadow-lg shadow-accent/20 group-hover:scale-105 transition-transform duration-200">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 text-brand-bg fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                <path d="M2 12h20" />
+              </svg>
+            </div>
             <span className="text-xl font-bold tracking-[0.2em] text-white font-sans group-hover:text-accent transition-colors">
               SHUTTER
             </span>
@@ -51,13 +58,20 @@ export default function Navbar({ session }: NavbarProps) {
 
           {/* Navigation Links (Desktop) */}
           <nav className="hidden md:flex items-center gap-8">
-            {['Platform', 'Solutions', 'Pricing', 'Resources', 'About'].map((item) => (
+            {[
+              { label: 'Platform', href: '/#platform' },
+              { label: 'Use Cases', href: '/#use-cases' },
+              { label: 'AI Audit', href: '/dashboard' },
+              { label: 'Blog', href: '/blog' },
+              { label: 'Docs', href: '/docs' },
+              { label: 'Book Demo', href: '/#book-demo' },
+            ].map((item) => (
               <Link
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="text-sm font-medium text-text-secondary hover:text-white transition-colors duration-200"
+                key={item.label}
+                href={item.href}
+                className="text-sm font-medium text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-4"
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </nav>
@@ -69,19 +83,20 @@ export default function Navbar({ session }: NavbarProps) {
                 <div className="flex items-center gap-4">
                   <Link
                     href="/dashboard"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200"
+                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/settings"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200"
+                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     Settings
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 cursor-pointer"
+                    aria-label="Log out from your account"
+                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     Logout
                   </button>
@@ -107,13 +122,14 @@ export default function Navbar({ session }: NavbarProps) {
                 <>
                   <Link
                     href="/login"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200"
+                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     Login
                   </Link>
                   <Link
                     href="/login"
-                    className="flex items-center justify-center bg-white text-brand-bg hover:bg-white/90 font-semibold text-sm px-5 py-2 rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-white/5"
+                    aria-label="Get started with Shutter"
+                    className="flex items-center justify-center bg-white text-brand-bg hover:bg-white/90 font-semibold text-sm px-5 py-2 rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
                   >
                     Get Started
                   </Link>
@@ -124,7 +140,7 @@ export default function Navbar({ session }: NavbarProps) {
             {/* Mobile Menu Trigger */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="block md:hidden text-text-secondary hover:text-white transition-colors p-1"
+              className="block md:hidden text-text-secondary hover:text-white transition-colors p-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
               aria-label="Toggle Menu"
             >
               <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -150,14 +166,21 @@ export default function Navbar({ session }: NavbarProps) {
             className="fixed inset-0 z-40 bg-[#05070A] pt-24 px-6 flex flex-col justify-between pb-12 md:hidden"
           >
             <nav className="flex flex-col gap-6 text-xl font-light">
-              {['Platform', 'Solutions', 'Pricing', 'Resources', 'About'].map((item) => (
+              {[
+                { label: 'Platform', href: '/#platform' },
+                { label: 'Use Cases', href: '/#use-cases' },
+                { label: 'AI Audit', href: '/dashboard' },
+                { label: 'Blog', href: '/blog' },
+                { label: 'Docs', href: '/docs' },
+                { label: 'Book Demo', href: '/#book-demo' },
+              ].map((item) => (
                 <Link
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
+                  key={item.label}
+                  href={item.href}
                   onClick={() => setIsOpen(false)}
                   className="text-text-secondary hover:text-white transition-colors py-2 border-b border-white/[0.03]"
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
             </nav>

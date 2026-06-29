@@ -14,6 +14,13 @@ export default function ScrollVideoHero() {
   const [loadPercentage, setLoadPercentage] = useState(0);
   const [phase, setPhase] = useState(0);
 
+  const scrollDown = () => {
+    const demoSec = document.getElementById('demo');
+    if (demoSec) {
+      demoSec.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   // Monitor Scroll Progress of the 300vh Hero container
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -217,17 +224,31 @@ export default function ScrollVideoHero() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -15 }}
                   transition={{ duration: 0.6, ease: 'easeOut' }}
-                  className="flex flex-col items-center"
+                  className="flex flex-col items-center pointer-events-auto"
                 >
-                  <span className="text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-4">
-                    THE FUTURE OF DISCOVERY
+                  <span className="text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-4 bg-accent/10 border border-accent/20 px-3 py-1 rounded-full animate-fadeIn">
+                    AI Visibility Platform
                   </span>
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-6 leading-[1.1]">
-                    The web was built <br /> for search.
+                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-6 leading-[1.1] max-w-3xl">
+                    Become Visible <br /> Inside AI.
                   </h1>
-                  <p className="text-base sm:text-lg text-text-secondary max-w-lg leading-relaxed">
-                    For decades, visibility meant ranking on Google.
+                  <p className="text-base sm:text-lg text-text-secondary max-w-2xl leading-relaxed mb-8">
+                    Shutter helps companies get discovered in ChatGPT, Claude, Gemini and Perplexity—not just Google.
                   </p>
+                  <div className="flex flex-col sm:flex-row gap-4 items-center">
+                    <Link
+                      href="/login"
+                      className="w-56 py-3.5 bg-white text-brand-bg hover:bg-neutral-200 font-semibold rounded-full text-center transition-all duration-200 hover:shadow-lg hover:shadow-white/5 cursor-pointer text-sm font-sans"
+                    >
+                      Get Free AI Visibility Audit
+                    </Link>
+                    <button
+                      onClick={scrollDown}
+                      className="w-56 py-3.5 border border-white/20 text-white hover:bg-white/5 font-semibold rounded-full text-center transition-all duration-200 cursor-pointer text-sm font-sans"
+                    >
+                      Watch Demo
+                    </button>
+                  </div>
                 </motion.div>
               )}
 
@@ -240,11 +261,14 @@ export default function ScrollVideoHero() {
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                   className="flex flex-col items-center"
                 >
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-6 leading-[1.1] max-w-3xl">
-                    Then AI changed how <br /> people find information.
-                  </h1>
-                  <p className="text-base sm:text-lg text-text-secondary max-w-xl leading-relaxed">
-                    Users no longer browse ten blue links. <br /> They ask questions and receive answers.
+                  <span className="text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-4">
+                    The paradigm shift
+                  </span>
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white mb-6 leading-[1.1] max-w-3xl">
+                    Are you visible <br /> inside AI?
+                  </h2>
+                  <p className="text-base text-text-secondary max-w-xl leading-relaxed">
+                    Traditional search index engines crawled keyword strings to rank pages. Today, AI assistants synthesize search recommendations, and you must optimize for how models perceive.
                   </p>
                 </motion.div>
               )}
@@ -258,14 +282,14 @@ export default function ScrollVideoHero() {
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                   className="flex flex-col items-center"
                 >
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-4 leading-[1.1]">
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white mb-4 leading-[1.1]">
                     Search finds pages.
-                  </h1>
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-light font-serif italic text-accent mb-6 leading-[1.1]">
+                  </h2>
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-light font-serif italic text-accent mb-6 leading-[1.1]">
                     AI finds meaning.
-                  </h1>
-                  <p className="text-base sm:text-lg text-text-secondary max-w-xl leading-relaxed">
-                    Modern discovery happens inside large language models.
+                  </h2>
+                  <p className="text-base text-text-secondary max-w-xl leading-relaxed">
+                    If AI doesn't mention your brand when formulating summaries or recommending lists, you don't exist in the conversation.
                   </p>
                 </motion.div>
               )}
@@ -279,11 +303,11 @@ export default function ScrollVideoHero() {
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                   className="flex flex-col items-center"
                 >
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-6 leading-[1.1]">
-                    Are you part <br /> of the answer?
-                  </h1>
-                  <p className="text-base sm:text-lg text-text-secondary max-w-md leading-relaxed">
-                    If AI doesn't mention your brand, <br /> you don't exist in the conversation.
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white mb-6 leading-[1.1] max-w-3xl">
+                    Become Discoverable Inside AI
+                  </h2>
+                  <p className="text-base text-text-secondary max-w-xl leading-relaxed">
+                    Optimize your brand footprint across vector databases, structured schemas, and direct citation sources.
                   </p>
                 </motion.div>
               )}
@@ -297,22 +321,25 @@ export default function ScrollVideoHero() {
                   transition={{ duration: 0.6, ease: 'easeOut' }}
                   className="flex flex-col items-center pointer-events-auto"
                 >
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-white mb-8 leading-[1.1]">
-                    Become discoverable <br /> by AI.
-                  </h1>
+                  <h2 className="text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-white mb-8 leading-[1.1]">
+                    Own Your AI Presence
+                  </h2>
+                  <p className="text-base text-text-secondary max-w-md leading-relaxed mb-8">
+                    Start auditing your citation index, attribute associations, and competitive recommendations today.
+                  </p>
                   <div className="flex flex-col sm:flex-row gap-4 items-center">
                     <Link
                       href="/login"
-                      className="w-48 py-3.5 bg-white text-brand-bg hover:bg-white/90 font-semibold rounded-full text-center transition-all duration-200 hover:shadow-lg hover:shadow-white/5 cursor-pointer"
+                      className="w-56 py-3.5 bg-white text-brand-bg hover:bg-neutral-200 font-semibold rounded-full text-center transition-all duration-200 hover:shadow-lg hover:shadow-white/5 cursor-pointer text-sm font-sans"
                     >
-                      Start Optimizing
+                      Get Free Visibility Audit
                     </Link>
-                    <Link
-                      href="#pricing"
-                      className="w-48 py-3.5 border border-white/20 text-white hover:bg-white/5 font-semibold rounded-full text-center transition-all duration-200 cursor-pointer"
+                    <button
+                      onClick={scrollDown}
+                      className="w-56 py-3.5 border border-white/20 text-white hover:bg-white/5 font-semibold rounded-full text-center transition-all duration-200 cursor-pointer text-sm font-sans"
                     >
-                      Book Demo
-                    </Link>
+                      Watch Demo
+                    </button>
                   </div>
                 </motion.div>
               )}

@@ -1,0 +1,21 @@
+# Shutter: AI Search & Answer Engine Optimization Platform
+
+Shutter is an enterprise platform for AEO (Answer Engine Optimization), GEO (Generative Engine Optimization), and AI Search Analytics. Shutter helps brand assets rank higher and secure citation references inside Large Language Model responses (ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews).
+
+## Core Capabilities
+- AI Visibility Audit: Scoring and diagnostic maps for semantic search presence.
+- Citation Tracking: Real-time logging of references cited by neural networks.
+- Entity Optimization: Automated schema generation to link entity relationships in knowledge graphs.
+- Competitive Benchmarking: Measuring AI share-of-voice indices against competitors.
+
+## Technical Standards
+- Next.js 15 App Router architecture.
+- Comprehensive JSON-LD structured schemas for Organizations, Products, WebSites, WebPages, Breadcrumbs, and FAQs.
+- Dynamic OG image generation and optimized semantic HTML outline.
+- Standardized robots.txt rules enabling GPTBot, ChatGPT-User, ClaudeBot, and PerplexityBot.
+
+## Guides & Documentation
+- Get Started: https://www.getshutter.online/docs/getting-started
+- AI Readiness: https://www.getshutter.online/docs/ai-readiness
+- Schema Setup: https://www.getshutter.online/docs/schema
+- API Reference: https://www.getshutter.online/docs/api

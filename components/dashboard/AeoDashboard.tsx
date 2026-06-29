@@ -132,7 +132,7 @@ export default function AeoDashboard() {
         <div>
           <div className="flex items-center justify-between border-b border-white/[0.05] pb-4 mb-6">
             <span className="text-xs font-bold text-white uppercase tracking-widest">
-              AEO Console
+              AI Visibility Console
             </span>
             <button
               onClick={() => setIsKeysOpen(true)}

@@ -93,7 +93,7 @@ export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProp
   return (
     <form onSubmit={handleSubmit} className="space-y-8 bg-white/[0.01] border border-white/[0.05] p-8 rounded-2xl">
       <div>
-        <h3 className="text-lg font-semibold text-white">AEO Diagnostic Scan</h3>
+        <h3 className="text-lg font-semibold text-white">AI Visibility Diagnostic Audit</h3>
         <p className="text-xs text-text-secondary mt-1">Identify semantic gaps and test model visibility across target AI indexes.</p>
       </div>
 
@@ -203,7 +203,7 @@ export default function ScanInputForm({ onSubmit, isLoading }: ScanInputFormProp
         disabled={isLoading}
         className="w-full py-4 bg-white text-brand-bg hover:bg-white/95 disabled:opacity-50 font-semibold text-sm rounded-xl text-center transition-all duration-200 hover:shadow-xl hover:shadow-white/5 cursor-pointer"
       >
-        {isLoading ? 'Scanning AI Engine Indexes...' : 'Launch Diagnostics Audit'}
+        {isLoading ? 'Scanning AI Engine Indexes...' : 'Launch AI Visibility Audit'}
       </button>
     </form>
   );

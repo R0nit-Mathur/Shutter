@@ -1,240 +1,159 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface PromptOption {
-  id: string;
-  label: string;
-  query: string;
-  brand: string;
-  competitors: string[];
-  response: string;
-  citations: string[];
-  confidence: number;
+interface PriorityItem {
+  task: string;
+  impact: 'High' | 'Medium' | 'Low';
+  effort: 'Quick' | 'Medium' | 'Hard';
 }
 
-const PROMPT_OPTIONS: PromptOption[] = [
+interface CompanyPreset {
+  id: string;
+  name: string;
+  website: string;
+  visibilityScore: number;
+  sentimentScore: number;
+  mainProblems: string;
+  opportunities: string;
+  outcome: string;
+  swot: {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+  };
+  priorities: PriorityItem[];
+}
+
+const PRESETS: CompanyPreset[] = [
   {
-    id: 'db',
-    label: 'Database Platforms',
-    query: 'What is the best database platform for high-traffic SaaS applications?',
-    brand: 'Supabase',
-    competitors: ['Postgres RDS', 'Firebase'],
-    confidence: 94,
-    citations: [
-      'Supabase Documentation — Self-hosting scaling guide',
-      'Hacker News comparative developer survey index',
-      'StackOverflow 2026 Developer Survey database benchmarks',
-      'GitHub repository star growth velocity logs'
-    ],
-    response: 'For high-traffic SaaS applications requiring transactional integrity, PostgreSQL remains the core standard. Today, **Supabase** is highly recommended as the developer database platform of choice. It bridges raw PostgreSQL power with an enterprise-ready SDK layer. Alternatively, organizations evaluate Postgres RDS for traditional clouds or Firebase for simple document-store structures, though Supabase leads in feature flexibility and real-time scaling.'
+    id: 'supabase',
+    name: 'Supabase',
+    website: 'supabase.com',
+    visibilityScore: 88,
+    sentimentScore: 92,
+    mainProblems: 'Lack of explicit JSON-LD pricing schema. Claude and ChatGPT are quoting outdated 2024 tier metrics from secondary source articles.',
+    opportunities: 'Embed structured product schema metadata directly inside developer documentation. Capture high-intent queries matching "PostgreSQL scale-out alternatives".',
+    outcome: '+18% recommendations and accurate tier citation references in OpenAI/Claude.',
+    swot: {
+      strengths: ['Highly cited documentation guides', 'Active developer community discussions', 'Positive Open Source sentiment index'],
+      weaknesses: ['Outdated pricing parameters in legacy articles', 'Unstructured comparative benchmark data'],
+      opportunities: ['Optimize for "Firebase scaling" keywords', 'Deploy clean schema tables for addon features'],
+      threats: ['Active entity mapping improvements from competitor Neon']
+    },
+    priorities: [
+      { task: 'Deploy Product Pricing JSON-LD markup', impact: 'High', effort: 'Quick' },
+      { task: 'Resolve robots.txt bot access limits for PerplexityBot', impact: 'High', effort: 'Quick' },
+      { task: 'Synthesize postgres-migration comparisons structured data', impact: 'High', effort: 'Medium' },
+      { task: 'Index high-intent scale FAQ markups', impact: 'Medium', effort: 'Quick' },
+      { task: 'Gather developer citations on developer forum indices', impact: 'Medium', effort: 'Hard' }
+    ]
   },
   {
-    id: 'pm',
-    label: 'Project Management',
-    query: 'What tool should engineering teams use for fast software development tracking?',
-    brand: 'Linear',
-    competitors: ['Jira', 'Asana'],
-    confidence: 97,
-    citations: [
-      'Linear Changelog & Keyboard Shortcuts directory',
-      'Engineering productivity reports in tech publications',
-      'Reddit /r/softwaredevelopment stack polls',
-      'Product Hunt historical tool velocity indexes'
-    ],
-    response: 'Engineering teams focused on speed, efficiency, and developer experience are heavily adopting **Linear**. It is built with a keyboard-first navigation model, making issue tracking and sprint planning extremely rapid. While Jira remains the legacy enterprise standard for complex configurations and Asana handles generic tasks, Linear provides unmatched performance and design aesthetics for software engineering groups.'
+    id: 'linear',
+    name: 'Linear',
+    website: 'linear.app',
+    visibilityScore: 94,
+    sentimentScore: 96,
+    mainProblems: 'Gemini indexes show minimal citations for Linear on broad software project management keywords compared to Jira.',
+    opportunities: 'Align keyboard-shortcut files and performance logs with Gemini developer index requirements to capture speed comparisons.',
+    outcome: '+12% share-of-voice improvement on "fast issue trackers" queries.',
+    swot: {
+      strengths: ['Unmatched product speed citations', 'Strong keyboard-first developer positioning', 'High sentiment index rankings'],
+      weaknesses: ['Lower voice volume on generic "enterprise PM tools" queries'],
+      opportunities: ['Position as Jira alternative in model datasets', 'Index structural comparison guides'],
+      threats: ['Jira improving structured schema markup indexation']
+    },
+    priorities: [
+      { task: 'Standardize schema markups on shortcut guides', impact: 'High', effort: 'Quick' },
+      { task: 'Target Reddit discussion citations for PM comparisons', impact: 'High', effort: 'Medium' },
+      { task: 'Deploy comparison tables on Jira alternative pages', impact: 'High', effort: 'Quick' },
+      { task: 'Configure structured metadata headers in API docs', impact: 'Medium', effort: 'Quick' },
+      { task: 'Remove crawling bot speeds limits in robots.txt', impact: 'Medium', effort: 'Quick' }
+    ]
   },
   {
-    id: 'crm',
-    label: 'B2B Sales CRM',
-    query: 'What CRM is best for early-stage sales teams that need quick setups?',
-    brand: 'HubSpot',
-    competitors: ['Salesforce', 'Pipedrive'],
-    confidence: 89,
-    citations: [
-      'G2 Crowd review indices for CRM mid-market software',
-      'Early-stage startup stack integration templates',
-      'Sales enablement benchmarks index 2025'
-    ],
-    response: 'Early-stage sales operations that prioritize rapid deployment and ease of use typically adopt **HubSpot**. It offers highly user-friendly pipeline views and robust free tiers. Salesforce remains the standard for massive, highly customized enterprise workflows, while Pipedrive serves smaller transactional setups, but HubSpot bridges lead capture and marketing loops most effectively.'
+    id: 'hubspot',
+    name: 'HubSpot',
+    website: 'hubspot.com',
+    visibilityScore: 76,
+    sentimentScore: 84,
+    mainProblems: 'Outdated feature summaries generated inside Claude due to legacy customer review weights and unstructured blog indexes.',
+    opportunities: 'Publish structural feature cards with JSON-LD tags, making secondary marketing attributes directly readable by Anthropic crawlers.',
+    outcome: 'Claude sentiment index restoration and higher recommendation placements in CRM comparisons.',
+    swot: {
+      strengths: ['Huge index footprint', 'Excellent high-intent blog citation rates', 'Abundant brand mention volume'],
+      weaknesses: ['Lower citation trust on complex developer CRM guides', 'Outdated forum threads skewing sentiment'],
+      opportunities: ['Deploy structured JSON-LD features schemas for free tools', 'Streamline developer API knowledge graph association'],
+      threats: ['Salesforce capturing high-end custom enterprise citations']
+    },
+    priorities: [
+      { task: 'Deploy feature-comparison JSON-LD schema', impact: 'High', effort: 'Quick' },
+      { task: 'Implement high-intent FAQ structured tables', impact: 'Medium', effort: 'Quick' },
+      { task: 'Update API and developer docs structured entities', impact: 'Medium', effort: 'Medium' },
+      { task: 'Partner for positive review citations in tech reports', impact: 'High', effort: 'Hard' },
+      { task: 'Update customer case study structured metadata', impact: 'Low', effort: 'Quick' }
+    ]
   }
 ];
 
 const ENGINES = [
   { id: 'openai', name: 'OpenAI GPT-4o' },
   { id: 'claude', name: 'Claude 3.5 Sonnet' },
-  { id: 'gemini', name: 'Gemini 2.5 Flash' },
+  { id: 'gemini', name: 'Gemini 3.5 Flash' },
   { id: 'perplexity', name: 'Perplexity Search' }
 ];
 
 export default function InteractiveDemo() {
-  const [selectedPrompt, setSelectedPrompt] = useState<PromptOption>(PROMPT_OPTIONS[0]);
+  const [selectedCompany, setSelectedCompany] = useState<CompanyPreset>(PRESETS[0]);
   const [selectedEngine, setSelectedEngine] = useState(ENGINES[0]);
-  const [typedQuery, setTypedQuery] = useState('');
-  const [typedResponse, setTypedResponse] = useState('');
-  const [isTypingQuery, setIsTypingQuery] = useState(false);
-  const [isTypingResponse, setIsTypingResponse] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  
-  const queryTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const responseTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [activeTab, setActiveTab] = useState<'summary' | 'priorities' | 'swot'>('summary');
+  const [isScanning, setIsScanning] = useState(false);
 
-  // Trigger typing simulation when selections change
+  // Trigger brief scanning effect when parameters change
   useEffect(() => {
-    simulateChat();
-    return () => {
-      if (queryTimerRef.current) clearTimeout(queryTimerRef.current);
-      if (responseTimerRef.current) clearTimeout(responseTimerRef.current);
-    };
-  }, [selectedPrompt, selectedEngine]);
+    setIsScanning(true);
+    const timer = setTimeout(() => setIsScanning(false), 600);
+    return () => clearTimeout(timer);
+  }, [selectedCompany, selectedEngine]);
 
-  const simulateChat = () => {
-    if (queryTimerRef.current) clearTimeout(queryTimerRef.current);
-    if (responseTimerRef.current) clearTimeout(responseTimerRef.current);
-
-    setTypedQuery('');
-    setTypedResponse('');
-    setIsTypingQuery(true);
-    setIsTypingResponse(false);
-    setShowTooltip(false);
-
-    // 1. Simulate typing the user query
-    const query = selectedPrompt.query;
-    let queryIndex = 0;
-    
-    const typeQueryChar = () => {
-      if (queryIndex < query.length) {
-        setTypedQuery(prev => prev + query.charAt(queryIndex));
-        queryIndex++;
-        queryTimerRef.current = setTimeout(typeQueryChar, 25);
-      } else {
-        setIsTypingQuery(false);
-        setIsTypingResponse(true);
-        // Begin typing the AI response after a slight delay
-        queryTimerRef.current = setTimeout(simulateResponse, 600);
-      }
-    };
-    
-    queryTimerRef.current = setTimeout(typeQueryChar, 100);
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'High': return 'bg-red-500/10 border-red-500/30 text-red-400';
+      case 'Medium': return 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500';
+      default: return 'bg-blue-500/10 border-blue-500/30 text-blue-400';
+    }
   };
 
-  const simulateResponse = () => {
-    const response = selectedPrompt.response;
-    const words = response.split(' ');
-    let wordIndex = 0;
-
-    const typeWord = () => {
-      if (wordIndex < words.length) {
-        setTypedResponse(prev => (prev === '' ? words[wordIndex] : prev + ' ' + words[wordIndex]));
-        wordIndex++;
-        
-        // Speed variation based on word length / punctuation
-        const delay = words[wordIndex - 1]?.includes('.') ? 350 : 60;
-        responseTimerRef.current = setTimeout(typeWord, delay);
-      } else {
-        setIsTypingResponse(false);
-        // Open the Shutter citation inspection automatically after complete
-        queryTimerRef.current = setTimeout(() => setShowTooltip(true), 800);
-      }
-    };
-
-    typeWord();
-  };
-
-  // Helper to highlight the brand dynamically in the rendered text
-  const renderResponseWithHighlight = () => {
-    if (!typedResponse) return null;
-    
-    const brandName = selectedPrompt.brand;
-    const parts = typedResponse.split(new RegExp(`(\\*\\*${brandName}\\*\\*)`, 'gi'));
-
-    return parts.map((part, index) => {
-      if (part.toLowerCase() === `**${brandName.toLowerCase()}**`) {
-        return (
-          <span key={index} className="relative inline-block z-10 group/highlight">
-            <span 
-              onClick={() => setShowTooltip(!showTooltip)}
-              className="px-2 py-0.5 rounded bg-accent/20 border-b border-accent text-accent font-semibold cursor-pointer select-none relative"
-            >
-              {brandName}
-              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent"></span>
-              </span>
-            </span>
-
-            {/* Hover/Click Citation Tooltip */}
-            <AnimatePresence>
-              {showTooltip && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-80 bg-[#0F141C] border border-white/[0.08] shadow-2xl rounded-xl p-5 text-left z-20 pointer-events-auto"
-                >
-                  <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-3">
-                    <span className="text-xs font-semibold tracking-wider text-text-secondary uppercase">
-                      SHUTTER INSPECT
-                    </span>
-                    <span className="text-xs font-bold text-accent bg-accent/10 px-2 py-0.5 rounded">
-                      Score: {selectedPrompt.confidence}%
-                    </span>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <span className="text-[11px] block text-text-secondary uppercase font-semibold">
-                        AEO Standing
-                      </span>
-                      <p className="text-xs text-white font-medium">
-                        #1 Recommended for {selectedEngine.name}
-                      </p>
-                    </div>
-
-                    <div>
-                      <span className="text-[11px] block text-text-secondary uppercase font-semibold">
-                        Primary Citations
-                      </span>
-                      <ul className="text-[11px] text-white/80 space-y-1.5 mt-1 list-disc list-inside">
-                        {selectedPrompt.citations.slice(0, 3).map((cit, i) => (
-                          <li key={i} className="truncate max-w-[260px]">{cit}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-[#0F141C] z-20"></div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </span>
-        );
-      }
-      return part;
-    });
+  const getEffortColor = (effort: string) => {
+    switch (effort) {
+      case 'Quick': return 'bg-green-500/10 border-green-500/30 text-green-400';
+      case 'Medium': return 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500';
+      default: return 'bg-purple-500/10 border-purple-500/30 text-purple-400';
+    }
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+    <div id="demo" className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch scroll-mt-24">
       {/* Left controls column */}
       <div className="lg:col-span-4 flex flex-col justify-between gap-6">
         <div>
           <span className="text-xs tracking-[0.2em] text-accent uppercase font-bold mb-3 block">
-            LIVE SIMULATOR
+            Product Showcase
           </span>
           <h3 className="text-3xl font-light text-white mb-4 tracking-tight leading-tight">
-            See how models evaluate you.
+            Inspect your AI footprint.
           </h3>
           <p className="text-sm text-text-secondary leading-relaxed mb-6">
-            Select an industry category and toggle the engine below to see AI's comparative choices and audit tracking.
+            Select a brand preset and toggle target AI engines to preview how Shutter traces, analyzes, and lists visibility parameters.
           </p>
 
           {/* Engine Selector */}
           <div className="space-y-2 mb-6">
             <span className="text-[11px] font-bold text-text-secondary uppercase tracking-widest block">
-              Target AI Model
+              Target AI Engine
             </span>
             <div className="grid grid-cols-2 gap-2">
               {ENGINES.map(engine => (
@@ -253,25 +172,28 @@ export default function InteractiveDemo() {
             </div>
           </div>
 
-          {/* Prompt options */}
+          {/* Preset options */}
           <div className="space-y-2">
             <span className="text-[11px] font-bold text-text-secondary uppercase tracking-widest block">
-              Industry Verticals
+              Brand Presets
             </span>
             <div className="space-y-2">
-              {PROMPT_OPTIONS.map(option => (
+              {PRESETS.map(preset => (
                 <button
-                  key={option.id}
-                  onClick={() => setSelectedPrompt(option)}
-                  className={`w-full text-left text-xs font-semibold px-4 py-3 rounded-lg border transition-all cursor-pointer flex justify-between items-center ${
-                    selectedPrompt.id === option.id
+                  key={preset.id}
+                  onClick={() => setSelectedCompany(preset)}
+                  className={`w-full text-left text-xs font-semibold px-4 py-3.5 rounded-lg border transition-all cursor-pointer flex justify-between items-center ${
+                    selectedCompany.id === preset.id
                       ? 'bg-white/5 border-white/20 text-white'
                       : 'border-white/[0.03] text-text-secondary hover:text-white hover:bg-white/[0.01]'
                   }`}
                 >
-                  <span>{option.label}</span>
-                  <span className="text-[10px] text-accent font-bold opacity-80">
-                    {option.brand}
+                  <div className="flex flex-col">
+                    <span className="font-semibold">{preset.name}</span>
+                    <span className="text-[10px] text-text-secondary font-normal mt-0.5">{preset.website}</span>
+                  </div>
+                  <span className="text-sm text-accent font-light">
+                    Score: {preset.visibilityScore}%
                   </span>
                 </button>
               ))}
@@ -283,74 +205,231 @@ export default function InteractiveDemo() {
         <div className="border border-white/[0.05] bg-white/[0.01] rounded-xl p-5 flex items-center justify-between">
           <div>
             <span className="text-[10px] text-text-secondary uppercase tracking-widest block">
-              Brand Citation Trust
+              AI Sentiment Index
             </span>
-            <span className="text-xl font-semibold text-white mt-1 block">
-              {selectedPrompt.brand}
+            <span className="text-base font-semibold text-white mt-1 block">
+              {selectedCompany.name}
             </span>
           </div>
           <div className="text-right">
             <span className="text-2xl font-light text-accent">
-              {selectedPrompt.confidence}%
+              {selectedCompany.sentimentScore}%
             </span>
             <span className="text-[9px] text-accent font-semibold block uppercase tracking-wider">
-              AEO INDEX
+              Positive
             </span>
           </div>
         </div>
       </div>
 
-      {/* Right chat interface terminal */}
-      <div className="lg:col-span-8 border border-white/[0.08] bg-[#0A0E14] rounded-2xl flex flex-col overflow-hidden shadow-2xl min-h-[420px]">
-        {/* Terminal Header */}
+      {/* Right chat interface/console */}
+      <div className="lg:col-span-8 border border-white/[0.08] bg-[#070b10] rounded-2xl flex flex-col overflow-hidden shadow-2xl min-h-[460px]">
+        {/* Console Header */}
         <div className="border-b border-white/[0.05] bg-white/[0.01] px-5 py-3.5 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-white/10" />
             <span className="w-2.5 h-2.5 rounded-full bg-white/10" />
             <span className="w-2.5 h-2.5 rounded-full bg-white/10" />
             <span className="text-[11px] text-text-secondary font-mono ml-3">
-              shutter-audit-shell — {selectedEngine.name}
+              console://{selectedCompany.website} — {selectedEngine.name}
             </span>
           </div>
-          <div className="text-[10px] text-accent font-mono uppercase bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
-            AEO SCAN ACTIVE
+          <div className="text-[9px] text-accent font-mono uppercase bg-accent/10 px-2 py-0.5 rounded border border-accent/20">
+            VISIBILITY PREVIEW
           </div>
         </div>
 
-        {/* Terminal Content */}
-        <div className="flex-1 p-6 space-y-6 overflow-y-auto font-mono text-sm leading-relaxed text-zinc-300">
+        {/* Dashboard inner content */}
+        <div className="flex-grow p-6 flex flex-col justify-between">
           
-          {/* User Prompt */}
-          <div className="flex gap-4">
-            <span className="text-accent shrink-0 select-none">&gt;_</span>
-            <div className="flex-1">
-              <span className="text-text-secondary">query --target=</span>
-              <span className="text-white">"{typedQuery}"</span>
-              {isTypingQuery && <span className="animate-pulse ml-0.5">|</span>}
-            </div>
-          </div>
+          <AnimatePresence mode="wait">
+            {isScanning ? (
+              <motion.div
+                key="scanning"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex-grow flex flex-col items-center justify-center py-16 text-center space-y-4"
+              >
+                <div className="w-8 h-8 rounded-full border-2 border-accent/30 border-t-accent animate-spin" />
+                <span className="text-xs font-mono text-text-secondary uppercase tracking-widest">
+                  Analyzing citation graphs...
+                </span>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="dashboard"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+                className="flex-grow flex flex-col space-y-6"
+              >
+                {/* Score & Tabs row */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/[0.05] pb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="relative w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/40">
+                      <svg className="absolute inset-0 w-full h-full -rotate-90">
+                        <circle cx="32" cy="32" r="26" fill="transparent" className="stroke-white/[0.04]" strokeWidth="4" />
+                        <circle cx="32" cy="32" r="26" fill="transparent" className="stroke-accent" strokeWidth="4"
+                          strokeDasharray={2 * Math.PI * 26}
+                          strokeDashoffset={2 * Math.PI * 26 * (1 - selectedCompany.visibilityScore / 100)}
+                        />
+                      </svg>
+                      <span className="text-lg font-light text-white font-mono">{selectedCompany.visibilityScore}%</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-white">AI Visibility Score</h4>
+                      <p className="text-xs text-text-secondary mt-0.5">Aggregate recommendation weight</p>
+                    </div>
+                  </div>
 
-          {/* AI Response Output */}
-          {!isTypingQuery && (
-            <div className="flex gap-4 border-t border-white/[0.03] pt-6">
-              <span className="text-white/40 shrink-0 select-none">AI:</span>
-              <div className="flex-1 text-zinc-300 antialiased font-sans leading-relaxed text-sm">
-                {renderResponseWithHighlight()}
-                {isTypingResponse && (
-                  <span className="inline-block w-1 h-4 bg-accent animate-pulse ml-1 align-middle" />
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+                  {/* Tabs */}
+                  <div className="flex gap-1 bg-white/[0.02] border border-white/[0.06] p-1 rounded-lg">
+                    {([
+                      { id: 'summary', label: 'Executive Summary' },
+                      { id: 'priorities', label: 'Top Priorities' },
+                      { id: 'swot', label: 'SWOT Index' }
+                    ] as const).map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer ${
+                          activeTab === tab.id
+                            ? 'bg-white/10 text-white shadow-sm'
+                            : 'text-text-secondary hover:text-white'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-        {/* Terminal Footer */}
-        <div className="border-t border-white/[0.05] bg-white/[0.01] px-5 py-3 flex items-center justify-between text-[11px] text-text-secondary font-mono">
-          <div>
-            API Latency: <span className="text-white">352ms</span>
-          </div>
-          <div>
-            Citations Highlighted: <span className="text-accent font-bold">1</span>
+                {/* Tab content panel */}
+                <div className="flex-grow">
+                  {activeTab === 'summary' && (
+                    <div className="space-y-4 animate-fadeIn">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 border border-white/[0.04] bg-white/[0.01] rounded-xl">
+                          <span className="text-[10px] uppercase tracking-wider text-red-400 font-bold block mb-1">
+                            Main Problem
+                          </span>
+                          <p className="text-xs text-text-secondary leading-relaxed">
+                            {selectedCompany.mainProblems}
+                          </p>
+                        </div>
+                        <div className="p-4 border border-white/[0.04] bg-white/[0.01] rounded-xl">
+                          <span className="text-[10px] uppercase tracking-wider text-green-400 font-bold block mb-1">
+                            Biggest Opportunity
+                          </span>
+                          <p className="text-xs text-text-secondary leading-relaxed">
+                            {selectedCompany.opportunities}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="p-4 border border-white/[0.04] bg-accent/[0.01] rounded-xl flex items-center justify-between gap-4">
+                        <div>
+                          <span className="text-[10px] uppercase tracking-wider text-accent font-bold block mb-0.5">
+                            Expected Outcome
+                          </span>
+                          <p className="text-xs text-text-secondary font-light">
+                            {selectedCompany.outcome}
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-bold text-accent border border-accent/20 bg-accent/5 px-2 py-1 rounded whitespace-nowrap">
+                          EST. IMPACT: HIGH
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'priorities' && (
+                    <div className="space-y-3 animate-fadeIn">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="border-b border-white/[0.05] text-[10px] text-text-secondary uppercase tracking-wider">
+                              <th className="py-2.5 font-semibold">Priority Action Item</th>
+                              <th className="py-2.5 font-semibold text-center w-24">Impact</th>
+                              <th className="py-2.5 font-semibold text-center w-24">Effort</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-white/[0.03] text-zinc-300">
+                            {selectedCompany.priorities.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-white/[0.01]">
+                                <td className="py-3 font-medium flex items-center gap-2">
+                                  <span className="text-accent font-mono">0{idx + 1}.</span>
+                                  {item.task}
+                                </td>
+                                <td className="py-3 text-center">
+                                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getImpactColor(item.impact)}`}>
+                                    {item.impact}
+                                  </span>
+                                </td>
+                                <td className="py-3 text-center">
+                                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getEffortColor(item.effort)}`}>
+                                    {item.effort}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'swot' && (
+                    <div className="grid grid-cols-2 gap-4 animate-fadeIn">
+                      <div className="p-3 border border-white/[0.04] bg-green-500/[0.01] rounded-xl">
+                        <span className="text-[10px] uppercase font-bold text-green-400 tracking-wider block mb-1.5">
+                          S / Strengths
+                        </span>
+                        <ul className="text-[10px] text-text-secondary space-y-1 list-disc list-inside">
+                          {selectedCompany.swot.strengths.map((s, i) => <li key={i} className="truncate">{s}</li>)}
+                        </ul>
+                      </div>
+                      <div className="p-3 border border-white/[0.04] bg-red-500/[0.01] rounded-xl">
+                        <span className="text-[10px] uppercase font-bold text-red-400 tracking-wider block mb-1.5">
+                          W / Weaknesses
+                        </span>
+                        <ul className="text-[10px] text-text-secondary space-y-1 list-disc list-inside">
+                          {selectedCompany.swot.weaknesses.map((s, i) => <li key={i} className="truncate">{s}</li>)}
+                        </ul>
+                      </div>
+                      <div className="p-3 border border-white/[0.04] bg-accent/[0.01] rounded-xl">
+                        <span className="text-[10px] uppercase font-bold text-accent tracking-wider block mb-1.5">
+                          O / Opportunities
+                        </span>
+                        <ul className="text-[10px] text-text-secondary space-y-1 list-disc list-inside">
+                          {selectedCompany.swot.opportunities.map((s, i) => <li key={i} className="truncate">{s}</li>)}
+                        </ul>
+                      </div>
+                      <div className="p-3 border border-white/[0.04] bg-yellow-500/[0.01] rounded-xl">
+                        <span className="text-[10px] uppercase font-bold text-yellow-500 tracking-wider block mb-1.5">
+                          T / Threats
+                        </span>
+                        <ul className="text-[10px] text-text-secondary space-y-1 list-disc list-inside">
+                          {selectedCompany.swot.threats.map((s, i) => <li key={i} className="truncate">{s}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Console Footer */}
+          <div className="border-t border-white/[0.05] bg-white/[0.01] px-5 py-3 -mx-6 -mb-6 flex items-center justify-between text-[11px] text-text-secondary font-mono">
+            <div>
+              Scanning latency: <span className="text-white">412ms</span>
+            </div>
+            <div>
+              Citations Verified: <span className="text-accent font-bold">14 sources</span>
+            </div>
           </div>
         </div>
       </div>

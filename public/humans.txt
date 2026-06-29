@@ -1,0 +1,10 @@
+/* TEAM */
+Founder: Shutter Founders
+Contact: hello@shutter.ai
+Website: https://www.getshutter.online
+
+/* SITE */
+Last update: 2026/06/29
+Standards: HTML5, CSS3, ESNext
+Components: Next.js 15 App Router, React 19, TailwindCSS 4, Framer Motion 12, GSAP
+Software: Vercel
