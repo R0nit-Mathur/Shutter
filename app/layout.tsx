@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,13 +17,6 @@ const geistMono = Geist_Mono({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: ["400"],
-  style: ["normal", "italic"]
 });
 
 export const metadata: Metadata = {
@@ -76,7 +70,7 @@ export const metadata: Metadata = {
       {
         url: "/api/og?title=Own+Your+AI+Presence",
         width: 1200,
-        "height": 630,
+        height: 630,
         alt: "Shutter — AI Search & Answer Engine Optimization Platform"
       }
     ]
@@ -154,16 +148,38 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} dark h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#05070A] text-white selection:bg-[#4F8CFF]/30 selection:text-white">
+      <head>
+        {/* Inline script to prevent theme flash and set dark mode by default */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const storedTheme = localStorage.getItem('theme');
+                if (storedTheme === 'light') {
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body 
+        className="min-h-full flex flex-col bg-brand-bg text-text-primary selection:bg-accent/30 selection:text-text-primary transition-colors duration-300 relative"
+        suppressHydrationWarning
+      >
+        <div className="gradient-bg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
         />
-        <SessionProvider>
-          {children}
-        </SessionProvider>
+        {children}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

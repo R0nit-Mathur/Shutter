@@ -1,30 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), var(--font-geist-sans), sans-serif;
-  --font-serif: var(--font-instrument-serif), serif;
-  
-  --color-brand-bg: #05070A;
-  --color-accent: #4F8CFF;
-  --color-text-secondary: #A1A1AA;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Space Mono", monospace;
 }
 
+/* Default Dark Mode Styles (Amzigo Deep Indigo/Purple Profile) */
 html {
   scroll-behavior: smooth;
-  background-color: #05070A;
+  background-color: #070710 !important;
+  color: #f4f4f5 !important;
+  font-family: var(--font-sans);
+  transition: background-color 0.25s ease, color 0.25s ease;
+
+  /* Custom properties for SVGs and graphs */
+  --accent: #c0b6fe;
+  --card-bg: #121124;
+  --card-border: rgba(192, 182, 254, 0.08);
 }
 
-/* Custom Scrollbar */
+/* Light Mode Overrides (Amzigo Light Vibe) */
+html:not(.dark) {
+  background-color: #ffffff !important;
+  color: #0f0f11 !important;
+
+  /* Custom properties for SVGs and graphs */
+  --accent: #7c3aed;
+  --card-bg: #ffffff;
+  --card-border: rgba(91, 33, 182, 0.06);
+}
+
+/* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070A;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1F2937;
+  background: #c0b6fe;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #374151;
+
+/* Marquee Scrolling Keyframes */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 28s linear infinite;
+  width: max-content;
+}
+
+/* Glowing background gradients from Amzigo design language */
+.gradient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 75% 25%, rgba(124, 92, 246, 0.15) 0%, transparent 50%),
+              radial-gradient(circle at 25% 75%, rgba(99, 102, 241, 0.12) 0%, transparent 55%);
+  z-index: 0;
+}
+html:not(.dark) .gradient-bg {
+  background: radial-gradient(circle at 75% 25%, rgba(124, 92, 246, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 25% 75%, rgba(99, 102, 241, 0.04) 0%, transparent 55%);
+}
+
+/* Dynamic Semantic Class Overrides */
+.bg-brand-bg {
+  background-color: #070710 !important;
+  transition: background-color 0.25s ease;
+}
+html:not(.dark) .bg-brand-bg {
+  background-color: #ffffff !important;
+}
+
+.bg-bg-secondary {
+  background-color: #0b0a17 !important;
+  transition: background-color 0.25s ease;
+}
+html:not(.dark) .bg-bg-secondary {
+  background-color: #f7f7f9 !important;
+}
+
+.text-text-primary {
+  color: #f4f4f5 !important;
+  transition: color 0.25s ease;
+}
+html:not(.dark) .text-text-primary {
+  color: #0f0f11 !important;
+}
+
+.text-text-secondary {
+  color: #9c9ca3 !important;
+}
+html:not(.dark) .text-text-secondary {
+  color: #636366 !important;
+}
+
+.bg-card-bg {
+  background-color: #121124 !important;
+  transition: background-color 0.25s ease;
+}
+html:not(.dark) .bg-card-bg {
+  background-color: #ffffff !important;
+}
+
+.border-card-border {
+  border-color: rgba(192, 182, 254, 0.08) !important;
+  transition: border-color 0.25s ease;
+}
+html:not(.dark) .border-card-border {
+  border-color: rgba(91, 33, 182, 0.06) !important;
+}
+
+.bg-input-bg {
+  background-color: #0b0a17 !important;
+  transition: background-color 0.25s ease;
+}
+html:not(.dark) .bg-input-bg {
+  background-color: #f7f7f9 !important;
+}
+
+.border-input-border {
+  border-color: rgba(192, 182, 254, 0.12) !important;
+  transition: border-color 0.25s ease;
+}
+html:not(.dark) .border-input-border {
+  border-color: rgba(91, 33, 182, 0.12) !important;
+}
+
+.bg-accent-bg {
+  background-color: rgba(192, 182, 254, 0.06) !important;
+  transition: background-color 0.25s ease;
+}
+html:not(.dark) .bg-accent-bg {
+  background-color: rgba(124, 58, 237, 0.04) !important;
+}
+
+/* Amzigo exact Lavender (#c0b6fe) and solid Violet (#7c3aed) definitions */
+.text-accent {
+  color: #c0b6fe !important;
+  transition: color 0.25s ease;
+}
+html:not(.dark) .text-accent {
+  color: #7c3aed !important;
+}
+
+.bg-accent {
+  background-color: #c0b6fe !important;
+  color: #070710 !important;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+html:not(.dark) .bg-accent {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+}
+
+.bg-accent-hover {
+  background-color: #d2cbff !important;
+  transition: background-color 0.25s ease;
+}
+html:not(.dark) .bg-accent-hover {
+  background-color: #6d28d9 !important;
 }

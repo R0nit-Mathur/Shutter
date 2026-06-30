@@ -2,19 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { signOut, useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { data: session } = useSession();
-  const user = session?.user;
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      if (window.scrollY > 30) {
         setIsScrolled(true);
       } else {
         setIsScrolled(false);
@@ -22,11 +20,25 @@ export default function Navbar() {
     };
 
     window.addEventListener('scroll', handleScroll);
+
+    // Determine theme on client mount
+    const isLight = document.documentElement.classList.contains('dark') === false;
+    setTheme(isLight ? 'light' : 'dark');
+    setMounted(true);
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' });
+  const toggleTheme = () => {
+    if (theme === 'dark') {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setTheme('light');
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setTheme('dark');
+    }
   };
 
   return (
@@ -34,21 +46,17 @@ export default function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled || isOpen
-            ? 'bg-[#05070A]/90 backdrop-blur-md border-b border-white/[0.08] py-4'
-            : 'bg-transparent py-6'
+            ? 'bg-brand-bg/80 backdrop-blur-md border-b border-card-border py-3'
+            : 'bg-transparent py-5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-accent to-[#70a3ff] shadow-lg shadow-accent/20 group-hover:scale-105 transition-transform duration-200">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-brand-bg fill-none stroke-current" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                <path d="M2 12h20" />
-              </svg>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-6 h-6 rounded-full border border-text-primary/20 flex items-center justify-center group-hover:border-text-primary transition-colors duration-300">
+              <div className="w-1.5 h-1.5 rounded-full bg-text-primary" />
             </div>
-            <span className="text-xl font-bold tracking-[0.2em] text-white font-sans group-hover:text-accent transition-colors">
+            <span className="text-xs font-semibold tracking-[0.35em] text-text-primary font-mono uppercase">
               SHUTTER
             </span>
           </Link>
@@ -58,97 +66,69 @@ export default function Navbar() {
             {[
               { label: 'Platform', href: '/#platform' },
               { label: 'Use Cases', href: '/#use-cases' },
-              { label: 'AI Audit', href: '/dashboard' },
-              { label: 'Blog', href: '/blog' },
-              { label: 'Docs', href: '/docs' },
-              { label: 'Book Demo', href: '/#book-demo' },
+              { label: 'Integrations', href: '/#integrations' },
+              { label: 'Pricing', href: '/#pricing' },
+              { label: 'FAQ', href: '/#faq' },
             ].map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-sm font-medium text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-4"
+                className="text-xs font-medium text-text-secondary hover:text-text-primary transition-colors duration-200"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          {/* Dynamic Auth Section (Desktop) & Hamburger Menu (Mobile) */}
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-4">
-              {user ? (
-                <div className="flex items-center gap-4">
-                  <Link
-                    href="/dashboard"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    aria-label="Log out from your account"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-                  >
-                    Logout
-                  </button>
-                  
-                  {/* User Avatar */}
-                  {user.image ? (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/20">
-                      <Image
-                        src={user.image}
-                        alt={user.name || 'User Profile'}
-                        fill
-                        sizes="32px"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center text-xs font-semibold text-accent">
-                      {user.name ? user.name[0].toUpperCase() : 'U'}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="text-sm font-semibold text-text-secondary hover:text-white transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/login"
-                    aria-label="Get started with Shutter"
-                    className="flex items-center justify-center bg-white text-brand-bg hover:bg-white/90 font-semibold text-sm px-5 py-2 rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-                  >
-                    Get Started
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Mobile Menu Trigger */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="block md:hidden text-text-secondary hover:text-white transition-colors p-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-              aria-label="Toggle Menu"
-            >
-              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                {isOpen ? (
-                  <path d="M18 6L6 18M6 6l12 12" />
+          {/* CTA & Theme Toggle (Desktop) */}
+          <div className="hidden md:flex items-center gap-4">
+            {mounted && (
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full border border-card-border hover:bg-bg-secondary text-text-primary transition-all duration-200 cursor-pointer flex items-center justify-center w-8 h-8"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="5" />
+                    <line x1="12" y1="1" x2="12" y2="3" />
+                    <line x1="12" y1="21" x2="12" y2="23" />
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                    <line x1="1" y1="12" x2="3" y2="12" />
+                    <line x1="21" y1="12" x2="23" y2="12" />
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                  </svg>
                 ) : (
-                  <path d="M4 6h16M4 12h16M4 18h16" />
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                  </svg>
                 )}
-              </svg>
-            </button>
+              </button>
+            )}
+            <Link
+              href="/#book-demo"
+              className="flex items-center justify-center bg-accent hover:bg-accent-hover text-white font-medium text-xs px-5 py-2 rounded-full transition-all duration-200"
+            >
+              Book a Call
+            </Link>
           </div>
+
+          {/* Mobile Menu Trigger */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="block md:hidden text-text-secondary hover:text-text-primary transition-colors p-1"
+            aria-label="Toggle Menu"
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              {isOpen ? (
+                <path d="M18 6L6 18M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -160,87 +140,43 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-[#05070A] pt-24 px-6 flex flex-col justify-between pb-12 md:hidden"
+            className="fixed inset-0 z-40 bg-brand-bg pt-24 px-6 flex flex-col justify-between pb-12 md:hidden"
           >
-            <nav className="flex flex-col gap-6 text-xl font-light">
+            <nav className="flex flex-col gap-6 text-lg font-light">
               {[
                 { label: 'Platform', href: '/#platform' },
                 { label: 'Use Cases', href: '/#use-cases' },
-                { label: 'AI Audit', href: '/dashboard' },
-                { label: 'Blog', href: '/blog' },
-                { label: 'Docs', href: '/docs' },
-                { label: 'Book Demo', href: '/#book-demo' },
+                { label: 'Integrations', href: '/#integrations' },
+                { label: 'Pricing', href: '/#pricing' },
+                { label: 'FAQ', href: '/#faq' },
               ].map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="text-text-secondary hover:text-white transition-colors py-2 border-b border-white/[0.03]"
+                  className="text-text-secondary hover:text-text-primary transition-colors py-2 border-b border-card-border"
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
 
-            <div className="flex flex-col gap-4 border-t border-white/[0.05] pt-8">
-              {user ? (
-                <>
-                  <div className="flex items-center gap-3 mb-2">
-                    {user.image && (
-                      <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/20">
-                        <Image
-                          src={user.image}
-                          alt={user.name || 'User Profile'}
-                          fill
-                          sizes="32px"
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <span className="text-sm text-white font-medium">{user.name || user.email}</span>
-                  </div>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setIsOpen(false)}
-                    className="text-base text-text-secondary hover:text-white py-2"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/settings"
-                    onClick={() => setIsOpen(false)}
-                    className="text-base text-text-secondary hover:text-white py-2"
-                  >
-                    Settings
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      handleLogout();
-                    }}
-                    className="text-left text-base text-accent font-semibold py-2"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="text-center py-3.5 border border-white/20 text-white font-semibold rounded-full"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/login"
-                    onClick={() => setIsOpen(false)}
-                    className="text-center py-3.5 bg-white text-brand-bg font-semibold rounded-full"
-                  >
-                    Get Started
-                  </Link>
-                </>
+            <div className="flex flex-col gap-4 border-t border-card-border pt-8">
+              {mounted && (
+                <button
+                  onClick={toggleTheme}
+                  className="w-full text-center py-2.5 border border-card-border text-text-primary rounded-full text-xs font-semibold flex items-center justify-center gap-2"
+                >
+                  {theme === 'dark' ? "Light Mode" : "Dark Mode"}
+                </button>
               )}
+              <Link
+                href="/#book-demo"
+                onClick={() => setIsOpen(false)}
+                className="text-center py-3 bg-accent text-white font-medium rounded-full text-xs"
+              >
+                Book a Call
+              </Link>
             </div>
           </motion.div>
         )}

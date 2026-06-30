@@ -42,18 +42,18 @@ function MetricCounter({ value, decimals = 0, suffix, label, description }: Metr
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="text-center lg:text-left flex flex-col justify-between p-8 border border-white/[0.05] bg-white/[0.01] rounded-2xl"
+      className="text-left flex flex-col justify-between p-8 border border-card-border bg-card-bg rounded-3xl relative shadow-sm transition-colors duration-300"
     >
       <div>
-        <div className="text-6xl sm:text-7xl font-light font-sans tracking-tight text-white mb-4">
+        <div className="text-6xl font-bold tracking-tight text-text-primary mb-4 font-mono">
           {decimals > 0 ? count.toFixed(decimals) : Math.round(count)}
-          <span className="text-accent ml-1 font-serif italic">{suffix}</span>
+          <span className="text-accent ml-1 font-bold">{suffix}</span>
         </div>
-        <h4 className="text-lg font-medium text-white mb-2">{label}</h4>
-        <p className="text-sm text-text-secondary leading-relaxed">{description}</p>
+        <h4 className="text-xs font-semibold text-text-primary tracking-wide font-mono uppercase mb-2">{label}</h4>
+        <p className="text-xs text-text-secondary leading-relaxed font-normal">{description}</p>
       </div>
     </motion.div>
   );
@@ -64,25 +64,22 @@ export default function MetricSection() {
   const isInView = useInView(containerRef, { once: true, margin: '-100px' });
 
   return (
-    <section ref={containerRef} className="py-32 px-6 border-t border-white/[0.05] bg-brand-bg relative overflow-hidden">
-      {/* Decorative backlights */}
-      <div className="pointer-events-none absolute -bottom-80 left-1/3 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
-      
+    <section ref={containerRef} className="py-32 px-6 border-t border-card-border bg-bg-secondary relative overflow-hidden transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-2xl mx-auto mb-20"
+          className="text-center max-w-2xl mx-auto mb-20 space-y-3"
         >
-          <span className="text-xs uppercase tracking-[0.2em] text-accent font-bold mb-3 block">
-            MEASURED RESULTS
+          <span className="text-[10px] uppercase tracking-[0.25em] text-accent font-bold mb-3 block">
+            02 / Verification
           </span>
-          <h2 className="text-4xl sm:text-5xl font-light text-white tracking-tight mb-4">
-            Auditable gains in AI rankings.
+          <h2 className="text-4xl font-bold text-text-primary tracking-tight mb-4">
+            Citations verified through structure.
           </h2>
-          <p className="text-base text-text-secondary leading-relaxed">
-            Data points gathered across 12,000 audited domains optimizing content specifically for model parameters.
+          <p className="text-xs text-text-secondary leading-relaxed font-normal max-w-md mx-auto">
+            Signals compiled across verified integrations, showing how alignment influences LLM recommendation weights.
           </p>
         </motion.div>
 
@@ -90,21 +87,21 @@ export default function MetricSection() {
           <MetricCounter
             value={73}
             suffix="%"
-            label="Visibility Increase"
-            description="Average increase in positive brand mentions across target OpenAI & Claude search queries within 90 days."
+            label="Verified Citation Rate"
+            description="Citations secured in comparison prompts across OpenAI and Claude directories within ninety days."
           />
           <MetricCounter
             value={4.3}
             decimals={1}
             suffix="x"
-            label="Citation Growth"
-            description="Multiplication of direct backlink citations from Perplexity answers, driving high-intent organic traffic."
+            label="Resource Proximity"
+            description="Closeness rating inside Perplexity vector space, ensuring direct links are extracted in place of competitors."
           />
           <MetricCounter
             value={58}
             suffix="%"
-            label="Appearence Rate"
-            description="Boost in placement frequencies inside competitive product recommendation listings and comparisons."
+            label="Recommendation Frequency"
+            description="Placement frequency inside multi-entity comparison summaries and PM query results."
           />
         </div>
       </div>
