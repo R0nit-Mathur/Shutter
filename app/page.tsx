@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import ScrollVideoHero from "@/components/ScrollVideoHero";
 import InteractiveDemo from "@/components/InteractiveDemo";
@@ -7,7 +6,6 @@ import FaqAccordion from "@/components/FaqAccordion";
 import Link from "next/link";
 
 export default async function Home() {
-  const session = await auth();
 
   const homeJsonLd = {
     "@context": "https://schema.org",
@@ -106,7 +104,7 @@ export default async function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(homeJsonLd) }}
       />
       {/* 1. Global Navigation Bar */}
-      <Navbar session={session} />
+      <Navbar />
 
       <main id="main-content">
         {/* 2. Scroll-Driven Observatory Hero Section */}

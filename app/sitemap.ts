@@ -14,6 +14,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/docs/llms-txt",
     "/docs/schema",
     "/docs/api",
+    "/what-is-aeo",
+    "/how-to-optimize-aeo",
+    "/what-is-geo",
+    "/how-to-optimize-geo",
+    "/what-is-ai-seo",
   ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),

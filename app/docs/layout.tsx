@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import React from "react";
@@ -16,12 +15,10 @@ export default async function DocsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-
   return (
     <div className="relative w-full min-h-screen bg-brand-bg text-white overflow-x-clip font-sans flex flex-col justify-between">
       <div>
-        <Navbar session={session} />
+        <Navbar />
 
         {/* Documentation Content Framework */}
         <div className="max-w-7xl mx-auto px-6 pt-32 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-12">

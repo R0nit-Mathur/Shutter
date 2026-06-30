@@ -3,16 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface NavbarProps {
-  session: any; // We receive the session object from the server component
-}
-
-export default function Navbar({ session }: NavbarProps) {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { data: session } = useSession();
   const user = session?.user;
 
   useEffect(() => {

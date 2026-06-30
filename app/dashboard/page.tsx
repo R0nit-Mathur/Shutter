@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   return (
     <div className="h-screen w-screen bg-brand-bg text-white font-sans flex flex-col overflow-hidden">
       {/* Navigation Header */}
-      <Navbar session={session} />
+      <Navbar />
 
       {/* Main AEO Diagnostic Console Workspace */}
       <main className="flex-grow h-[calc(100vh-72px)] mt-[72px] overflow-hidden">

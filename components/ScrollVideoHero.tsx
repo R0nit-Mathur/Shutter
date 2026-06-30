@@ -13,6 +13,7 @@ export default function ScrollVideoHero() {
   const [allLoaded, setAllLoaded] = useState(false);
   const [loadPercentage, setLoadPercentage] = useState(0);
   const [phase, setPhase] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const scrollDown = () => {
     const demoSec = document.getElementById('demo');
@@ -27,45 +28,99 @@ export default function ScrollVideoHero() {
     offset: ['start start', 'end end'],
   });
 
+  // Viewport detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Transform background overlay opacity & blur based on progress
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.8, 1.0], [0.55, 0.55, 0.2]);
-  const blurValue = useTransform(scrollYProgress, [0, 0.8, 1.0], [1.5, 1.5, 0]);
   const canvasOpacity = useTransform(scrollYProgress, [0.9, 1.0], [1.0, 0.85]);
 
-  // Preload frames asynchronously
+  // Framer Motion transforms mapped directly to style attributes for off-thread performance
+  const overlayBg = useTransform(scrollYProgress, [0, 0.8, 1.0], [
+    'rgba(5, 7, 10, 0.55)',
+    'rgba(5, 7, 10, 0.55)',
+    'rgba(5, 7, 10, 0.2)'
+  ]);
+
+  const overlayBlur = useTransform(scrollYProgress, [0, 0.8, 1.0], [
+    'blur(1.5px)',
+    'blur(1.5px)',
+    'blur(0px)'
+  ]);
+
+  // Preload frames progressively (Desktop only)
   useEffect(() => {
+    if (isMobile) {
+      setAllLoaded(true);
+      return;
+    }
+
     let loadedCount = 0;
     const preloadedImages: HTMLImageElement[] = [];
+    const totalFrames = frames.length;
 
-    const loadImages = async () => {
-      const promises = frames.map((frameName, index) => {
-        return new Promise<void>((resolve) => {
-          const img = new Image();
-          img.src = `/asset/bg/${frameName}`;
-          img.onload = () => {
-            loadedCount++;
-            setLoadPercentage(Math.round((loadedCount / frames.length) * 100));
-            preloadedImages[index] = img;
-            resolve();
-          };
-          img.onerror = () => {
-            loadedCount++;
-            resolve();
-          };
-        });
-      });
-
+    const loadBatch = async (startIdx: number, endIdx: number) => {
+      const promises = [];
+      for (let i = startIdx; i < endIdx && i < totalFrames; i++) {
+        const frameName = frames[i];
+        promises.push(
+          new Promise<void>((resolve) => {
+            const img = new Image();
+            img.src = `/asset/bg/${frameName}`;
+            img.onload = () => {
+              loadedCount++;
+              setLoadPercentage(Math.round((loadedCount / totalFrames) * 100));
+              preloadedImages[i] = img;
+              resolve();
+            };
+            img.onerror = () => {
+              loadedCount++;
+              resolve();
+            };
+          })
+        );
+      }
       await Promise.all(promises);
-      imagesRef.current = preloadedImages;
-      setAllLoaded(true);
     };
 
-    loadImages();
-  }, []);
+    const loadAllProgressively = async () => {
+      // Load initial batch of 15 frames immediately to resolve loader screen
+      await loadBatch(0, 15);
+
+      // Async decode initial batch of 15 frames off-thread so initial render is instant
+      const decodePromises = preloadedImages.slice(0, 15).map(img => {
+        if (img) {
+          img.setAttribute('data-decoded', 'true');
+          return img.decode().catch(() => img.removeAttribute('data-decoded'));
+        }
+        return Promise.resolve();
+      });
+      await Promise.all(decodePromises);
+
+      imagesRef.current = preloadedImages;
+      setAllLoaded(true);
+
+      // Load remaining frames in batches in background
+      const batchSize = 15;
+      for (let i = 15; i < totalFrames; i += batchSize) {
+        await new Promise((r) => setTimeout(r, 60)); // Yield thread
+        await loadBatch(i, i + batchSize);
+        imagesRef.current = preloadedImages;
+      }
+    };
+
+    loadAllProgressively();
+  }, [isMobile]);
 
   // Set Canvas dimensions and draw initial frame when loaded
   useEffect(() => {
-    if (!allLoaded || !canvasRef.current) return;
+    if (isMobile || !allLoaded || !canvasRef.current) return;
 
     const handleResize = () => {
       const canvas = canvasRef.current;
@@ -94,7 +149,7 @@ export default function ScrollVideoHero() {
     handleResize();
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [allLoaded]);
+  }, [allLoaded, isMobile]);
 
   // Canvas drawing handler
   const drawFrame = (index: number, width: number, height: number) => {
@@ -104,13 +159,32 @@ export default function ScrollVideoHero() {
     if (!ctx) return;
 
     const img = imagesRef.current[index];
-    if (!img || !img.complete) return;
+    // Find closest loaded frame if not loaded in background queue yet
+    let fallbackImg = img;
+    if (!fallbackImg || !fallbackImg.complete) {
+      for (let i = index - 1; i >= 0; i--) {
+        if (imagesRef.current[i] && imagesRef.current[i].complete) {
+          fallbackImg = imagesRef.current[i];
+          break;
+        }
+      }
+    }
+    if (!fallbackImg || !fallbackImg.complete) {
+      for (let i = index + 1; i < frames.length; i++) {
+        if (imagesRef.current[i] && imagesRef.current[i].complete) {
+          fallbackImg = imagesRef.current[i];
+          break;
+        }
+      }
+    }
+
+    if (!fallbackImg || !fallbackImg.complete) return;
 
     // Clear previous drawing
     ctx.clearRect(0, 0, width, height);
 
-    const imgWidth = img.width;
-    const imgHeight = img.height;
+    const imgWidth = fallbackImg.width;
+    const imgHeight = fallbackImg.height;
     const imgRatio = imgWidth / imgHeight;
     const canvasRatio = width / height;
 
@@ -128,27 +202,46 @@ export default function ScrollVideoHero() {
       offsetY = (height - drawHeight) / 2;
     }
 
-    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    ctx.drawImage(fallbackImg, offsetX, offsetY, drawWidth, drawHeight);
   };
+
+  const isDrawingRef = useRef(false);
+  const nextFrameIndexRef = useRef(0);
 
   // Bind scrolling scrollYProgress to frame indices and text phases
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
-    if (!allLoaded || imagesRef.current.length === 0) return;
+    if (isMobile || !allLoaded || imagesRef.current.length === 0) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Fetch window size dynamically to bypass state closures
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    // Determine current video frame index
     const frameIndex = Math.min(imagesRef.current.length - 1, Math.floor(latest * imagesRef.current.length));
-    
-    // Draw on animation frame for optimal 60fps performance
-    requestAnimationFrame(() => {
-      drawFrame(frameIndex, width, height);
-    });
+    nextFrameIndexRef.current = frameIndex;
+
+    // Trigger sliding window decoding around the current frame index (pre-decodes next 12 frames ahead/around)
+    const windowSize = 12;
+    const start = Math.max(0, frameIndex - 3);
+    const end = Math.min(imagesRef.current.length - 1, frameIndex + windowSize);
+    for (let i = start; i <= end; i++) {
+      const img = imagesRef.current[i];
+      if (img && !img.hasAttribute('data-decoded')) {
+        img.setAttribute('data-decoded', 'true');
+        img.decode().catch(() => {
+          img.removeAttribute('data-decoded'); // Allow retry on failure
+        });
+      }
+    }
+
+    // Debounce canvas drawing with requestAnimationFrame
+    if (!isDrawingRef.current) {
+      isDrawingRef.current = true;
+      requestAnimationFrame(() => {
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+          drawFrame(nextFrameIndexRef.current, width, height);
+        }
+        isDrawingRef.current = false;
+      });
+    }
 
     // Map scroll progress to text phases
     let newPhase = 0;
@@ -170,7 +263,7 @@ export default function ScrollVideoHero() {
         
         {/* Sleek Loading Screen */}
         <AnimatePresence>
-          {!allLoaded && (
+          {!allLoaded && !isMobile && (
             <motion.div
               key="loader"
               exit={{ opacity: 0 }}
@@ -193,28 +286,37 @@ export default function ScrollVideoHero() {
           )}
         </AnimatePresence>
 
-        {/* Pinned Canvas */}
-        <motion.canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-          style={{ opacity: canvasOpacity }}
-        />
+        {/* Pinned Canvas (Desktop) */}
+        {!isMobile && (
+          <motion.canvas
+            ref={canvasRef}
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            style={{ opacity: canvasOpacity }}
+          />
+        )}
+
+        {/* Pulsing Ambient Background (Mobile Fallback) */}
+        {isMobile && (
+          <div className="absolute inset-0 overflow-hidden bg-[#05070A] pointer-events-none">
+            <div 
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full bg-accent/10 blur-[110px] animate-pulse" 
+              style={{ animationDuration: '7s' }}
+            />
+            <div className="absolute top-[10%] left-[20%] w-[40%] h-[40%] rounded-full bg-blue-500/5 blur-[90px]" />
+          </div>
+        )}
 
         {/* Dynamic Dark Vignette & Readability Treatment */}
         <motion.div
           className="absolute inset-0 pointer-events-none bg-radial-[circle_at_center,transparent_40%,rgba(5,7,10,0.85)_100%]"
           style={{
-            backgroundColor: overlayOpacity.get()
-              ? `rgba(5, 7, 10, ${overlayOpacity.get()})`
-              : 'rgba(5, 7, 10, 0.55)',
-            backdropFilter: blurValue.get()
-              ? `blur(${blurValue.get()}px)`
-              : 'blur(1.5px)',
+            backgroundColor: overlayBg,
+            backdropFilter: overlayBlur,
           }}
         />
 
         {/* Scrolling Narrative Text Overlays */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center select-none pointer-events-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center select-none pointer-events-none z-30">
           <div className="w-full max-w-4xl min-h-[300px] flex items-center justify-center">
             <AnimatePresence mode="wait">
               {phase === 0 && (

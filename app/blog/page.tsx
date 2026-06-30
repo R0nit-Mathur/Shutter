@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -123,8 +122,6 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const session = await auth();
-
   const blogBreadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -152,7 +149,7 @@ export default async function BlogPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogBreadcrumb) }}
       />
       <div>
-        <Navbar session={session} />
+        <Navbar />
         
         {/* Blog Header */}
         <header className="pt-36 pb-20 px-6 border-b border-white/[0.05] relative">

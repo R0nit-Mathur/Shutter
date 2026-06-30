@@ -1,4 +1,3 @@
-import { auth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -82,7 +81,6 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
   const { content } = parseFrontmatter(fileContent);
   const renderedContent = renderMarkdown(content);
 
-  const session = await auth();
   const otherPosts = BLOG_POSTS.filter((p) => p.slug !== slug).slice(0, 3);
 
   // Dynamic Schemas: Article and Breadcrumb
@@ -157,7 +155,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
       <div>
-        <Navbar session={session} />
+        <Navbar />
         
         {/* Article Header */}
         <header className="pt-40 pb-16 px-6 max-w-4xl mx-auto">
