@@ -22,13 +22,18 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.getshutter.online"),
   title: {
-    default: "Shutter — AI Search & Answer Engine Optimization Platform",
-    template: "%s | Shutter",
+    default: "Shutter AEO — AI Search & Answer Engine Optimization Agency",
+    template: "%s | Shutter AEO",
   },
-  description: "Improve your visibility across ChatGPT, Claude, Gemini, Perplexity and Google AI Overviews using Shutter.",
+  description: "Shutter AEO is a premier AI Search & Generative Engine Optimization agency. Maximize visibility, citations, and organic product mentions across ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.",
   keywords: [
+    "Shutter",
+    "Shutter AEO",
+    "Shutter AEO Agency",
+    "Shutter AI SEO",
     "Answer Engine Optimization",
     "AEO",
+    "AEO Agency",
     "Generative Engine Optimization",
     "GEO",
     "AI Search Optimization",
@@ -43,8 +48,8 @@ export const metadata: Metadata = {
     "LLM Indexation"
   ],
   authors: [{ name: "Shutter Team", url: "https://www.getshutter.online" }],
-  creator: "Shutter",
-  publisher: "Shutter",
+  creator: "Shutter AEO",
+  publisher: "Shutter AEO",
   robots: {
     index: true,
     follow: true,
@@ -63,23 +68,23 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://www.getshutter.online",
-    title: "Shutter — AI Search & Answer Engine Optimization Platform",
-    description: "Improve your visibility across ChatGPT, Claude, Gemini, Perplexity and Google AI Overviews using Shutter.",
-    siteName: "Shutter",
+    title: "Shutter AEO — AI Search & Answer Engine Optimization Agency",
+    description: "Maximize your organic brand citations across top AI search models including ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.",
+    siteName: "Shutter AEO",
     images: [
       {
-        url: "/api/og?title=Own+Your+AI+Presence",
-        width: 1200,
-        height: 630,
-        alt: "Shutter — AI Search & Answer Engine Optimization Platform"
+        url: "/shutter_logo.png",
+        width: 1024,
+        height: 1024,
+        alt: "Shutter AEO Logo"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shutter — AI Search & Answer Engine Optimization Platform",
-    description: "Improve your visibility across ChatGPT, Claude, Gemini, Perplexity and Google AI Overviews using Shutter.",
-    images: ["/api/og?title=Own+Your+AI+Presence"],
+    title: "Shutter AEO — AI Search & Answer Engine Optimization Agency",
+    description: "Maximize your organic brand citations across ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.",
+    images: ["/shutter_logo.png"],
     creator: "@getshutter",
   },
 };
@@ -95,9 +100,9 @@ export default function RootLayout({
       "@context": "https://schema.org",
       "@type": "Organization",
       "@id": "https://www.getshutter.online/#organization",
-      "name": "Shutter",
+      "name": "Shutter AEO",
       "url": "https://www.getshutter.online",
-      "logo": "https://www.getshutter.online/logo.png",
+      "logo": "https://www.getshutter.online/shutter_logo.png",
       "sameAs": [
         "https://x.com/getshutter",
         "https://github.com/getshutter"
@@ -116,8 +121,8 @@ export default function RootLayout({
       "@type": "WebSite",
       "@id": "https://www.getshutter.online/#website",
       "url": "https://www.getshutter.online",
-      "name": "Shutter",
-      "description": "AI Search & Answer Engine Optimization Platform",
+      "name": "Shutter AEO",
+      "description": "AI Search & Answer Engine Optimization Agency",
       "publisher": {
         "@id": "https://www.getshutter.online/#organization"
       },

@@ -53,10 +53,12 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-6 h-6 rounded-full border border-text-primary/20 flex items-center justify-center group-hover:border-text-primary transition-colors duration-300">
-              <div className="w-1.5 h-1.5 rounded-full bg-text-primary" />
-            </div>
-            <span className="text-xs font-semibold tracking-[0.35em] text-text-primary font-mono uppercase">
+            <img 
+              src="/shutter_logo.png" 
+              alt="Shutter Logo" 
+              className="w-7 h-7 object-contain rounded-md"
+            />
+            <span className="text-xs font-bold tracking-[0.35em] text-text-primary font-mono uppercase">
               SHUTTER
             </span>
           </Link>

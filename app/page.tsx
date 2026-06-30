@@ -776,9 +776,16 @@ export default function Home() {
             
             {/* Left Section: Architecture & Archive Label */}
             <div className="col-span-12 md:col-span-5 flex flex-col gap-6 text-left">
-              <span className="text-[9px] font-mono text-accent uppercase tracking-[0.3em] font-semibold">
-                Room 04 / The Archive Vault
-              </span>
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/shutter_logo.png" 
+                  alt="Shutter Logo" 
+                  className="w-8 h-8 object-contain rounded-md"
+                />
+                <span className="text-sm font-bold tracking-[0.3em] text-text-primary font-mono uppercase">
+                  SHUTTER AEO
+                </span>
+              </div>
               <div className="text-text-secondary text-xs font-sans space-y-4 font-light leading-relaxed">
                 <div>
                   <p className="font-sans font-bold text-text-primary">"Every document is a coordinate. Every citation is a weight."</p>

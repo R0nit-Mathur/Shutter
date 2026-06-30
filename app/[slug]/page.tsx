@@ -249,7 +249,7 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-brand-bg text-white overflow-x-clip font-sans flex flex-col justify-between">
+    <div className="relative w-full min-h-screen bg-brand-bg text-text-primary overflow-x-clip font-sans flex flex-col justify-between transition-colors duration-300">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -260,10 +260,10 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
         {/* Article Header */}
         <header className="pt-40 pb-16 px-6 max-w-4xl mx-auto">
           <div className="space-y-4">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent bg-accent/10 border border-accent/20 px-3 py-1 rounded-full">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent bg-accent-bg border border-card-border px-3 py-1 rounded-full">
               {guide.category} GUIDE
             </span>
-            <h1 className="text-3xl sm:text-5xl font-light text-white tracking-tight leading-tight mt-4">
+            <h1 className="text-3xl sm:text-5xl font-light text-text-primary tracking-tight leading-tight mt-4">
               {guide.title}
             </h1>
             <div className="flex items-center gap-4 text-xs text-text-secondary font-mono pt-2">
@@ -278,13 +278,13 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
         <main className="pb-32 px-6 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Main content */}
-          <article className="lg:col-span-8 border border-white/[0.05] bg-white/[0.01] p-8 rounded-2xl">
-            <div className="prose prose-invert max-w-none">
+          <article className="lg:col-span-8 border border-card-border bg-card-bg p-8 rounded-2xl">
+            <div className="prose prose-invert max-w-none text-text-primary">
               {renderedContent}
             </div>
 
             {/* Back button */}
-            <div className="border-t border-white/[0.05] pt-8 mt-12">
+            <div className="border-t border-card-border pt-8 mt-12">
               <Link
                 href="/"
                 className="inline-flex items-center gap-2 text-xs font-mono text-accent hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
@@ -296,7 +296,7 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
 
           {/* Sidebar suggestions */}
           <aside className="lg:col-span-4 space-y-6">
-            <div className="p-6 border border-white/[0.05] bg-white/[0.01] rounded-2xl space-y-4">
+            <div className="p-6 border border-card-border bg-card-bg rounded-2xl space-y-4">
               <h4 className="text-xs font-mono uppercase tracking-widest text-text-secondary font-bold">
                 More AI Search Guides
               </h4>
@@ -311,7 +311,7 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
                     <span className="text-[9px] text-accent font-mono block mb-1 uppercase font-bold">
                       {sidebarGuide.category}
                     </span>
-                    <h5 className="text-sm font-semibold text-white group-hover:text-accent transition-colors leading-snug">
+                    <h5 className="text-sm font-semibold text-text-primary group-hover:text-accent transition-colors leading-snug">
                       {sidebarGuide.title}
                     </h5>
                   </Link>
@@ -319,14 +319,14 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
               </div>
             </div>
 
-            <div className="p-6 border border-accent/20 bg-accent/[0.01] rounded-2xl space-y-4">
-              <h4 className="text-sm font-semibold text-white">Optimize your AI Presence</h4>
+            <div className="p-6 border border-card-border bg-card-bg rounded-2xl space-y-4">
+              <h4 className="text-sm font-semibold text-text-primary">Optimize your AI Presence</h4>
               <p className="text-xs text-text-secondary leading-relaxed">
                 Run a diagnostic check to verify if ChatGPT, Claude, and Gemini recommend your product accurately.
               </p>
               <Link
                 href="/login"
-                className="w-full block py-2.5 bg-white text-brand-bg hover:bg-neutral-200 font-semibold text-xs rounded-full text-center transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+                className="w-full block py-2.5 bg-accent hover:bg-accent-hover text-brand-bg font-semibold text-xs rounded-full text-center transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
               >
                 Launch Free Snapshot
               </Link>
@@ -337,12 +337,19 @@ export default async function GuideDetailPage({ params }: GuideDetailProps) {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.05] py-8 px-6 text-center text-xs text-neutral-500 font-mono">
+      <footer className="border-t border-card-border py-8 px-6 text-center text-xs text-text-secondary font-mono bg-bg-secondary transition-colors duration-300">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span>&copy; 2026 Shutter. Own Your AI Presence.</span>
+          <div className="flex items-center gap-2">
+            <img 
+              src="/shutter_logo.png" 
+              alt="Shutter Logo" 
+              className="w-5 h-5 object-contain rounded-sm"
+            />
+            <span>&copy; 2026 Shutter AEO. Own Your AI Presence.</span>
+          </div>
           <div className="flex gap-6">
-            <Link href="/" className="hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">Home</Link>
-            <Link href="/blog" className="hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">Visibility Blog</Link>
+            <Link href="/" className="hover:text-accent transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">Home</Link>
+            <Link href="/blog" className="hover:text-accent transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent">Visibility Blog</Link>
           </div>
         </div>
       </footer>
