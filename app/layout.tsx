@@ -22,15 +22,19 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.getshutter.online"),
   title: {
-    default: "Shutter AEO — AI Search & Answer Engine Optimization Agency",
-    template: "%s | Shutter AEO",
+    default: "Shutter | #1 AEO, SEO & GEO Optimization Agency",
+    template: "%s | Shutter AEO, SEO & GEO",
   },
-  description: "Shutter AEO is a premier AI Search & Generative Engine Optimization agency. Maximize visibility, citations, and organic product mentions across ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.",
+  description: "Shutter is a premier AEO, SEO, and GEO (Generative Engine Optimization) agency. Maximize visibility, citations, and organic product mentions across ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.",
   keywords: [
     "Shutter",
     "Shutter AEO",
-    "Shutter AEO Agency",
-    "Shutter AI SEO",
+    "Shutter Agency",
+    "Shutter Software",
+    "AEO SEO GEO optimisation",
+    "GEO optimization",
+    "AEO optimization",
+    "SEO optimization",
     "Answer Engine Optimization",
     "AEO",
     "AEO Agency",
@@ -45,6 +49,7 @@ export const metadata: Metadata = {
     "Google AI Overviews",
     "AI Search Analytics",
     "SaaS SEO",
+    "hardware shutter stores",
     "LLM Indexation"
   ],
   authors: [{ name: "Shutter Team", url: "https://www.getshutter.online" }],
@@ -61,6 +66,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  icons: {
+    icon: "/shutter_logo.png",
+  },
   alternates: {
     canonical: "/",
   },
@@ -68,9 +76,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://www.getshutter.online",
-    title: "Shutter AEO — AI Search & Answer Engine Optimization Agency",
-    description: "Maximize your organic brand citations across top AI search models including ChatGPT, Claude, Gemini, Perplexity, and Google AI Overviews.",
-    siteName: "Shutter AEO",
+    title: "Shutter | #1 AEO, SEO & GEO Optimization Agency",
+    description: "Maximize your organic brand citations across top AI search models and search engines including ChatGPT, Claude, Gemini, Perplexity, and Google.",
+    siteName: "Shutter Agency",
     images: [
       {
         url: "/shutter_logo.png",
@@ -101,6 +109,8 @@ export default function RootLayout({
       "@type": "Organization",
       "@id": "https://www.getshutter.online/#organization",
       "name": "Shutter AEO",
+      "alternateName": ["Shutter Agency", "Shutter Software", "Shutter SEO", "Shutter GEO"],
+      "disambiguatingDescription": "A B2B digital marketing, AEO, SEO, and GEO optimization agency. Not associated with physical hardware shutters, window treatments, or hardware shutter stores.",
       "url": "https://www.getshutter.online",
       "logo": "https://www.getshutter.online/shutter_logo.png",
       "sameAs": [
