@@ -315,9 +315,9 @@ export default function Home() {
       {/* 1. Global Navigation Bar */}
       <Navbar />
 
-      {/* Hardware Disambiguation Banner */}
-      <div className="w-full bg-accent/90 text-white text-center py-2.5 px-4 text-[10px] sm:text-xs font-mono tracking-wider z-40 relative">
-        Looking for window treatments or <span className="font-bold">hardware shutter stores</span>? We can't help with your windows, but we are the #1 agency for <span className="font-bold">AEO, SEO, and GEO optimisation</span>.
+      {/* Hardware Disambiguation Banner (Hidden for users, visible to crawlers) */}
+      <div className="sr-only">
+        Looking for window treatments or hardware shutter stores? We can't help with your windows, but we are the #1 agency for AEO, SEO, and GEO optimisation.
       </div>
 
       {/* 2. Sticky Scrollytelling Side Indicator */}
